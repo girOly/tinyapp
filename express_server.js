@@ -12,7 +12,7 @@ const urlDatabase = {
 };
 
 app.get("/", (req, res) => {
-  res.send("Bonjour!");
+  res.redirect("/urls");
 });
 
 app.listen(PORT, () => {
@@ -62,4 +62,16 @@ app.get("/u/:shortURL", (req, res) => {
   // console.log(req.params);
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
+});
+
+app.post("/urls/:id/delete", (req, res) => {
+  let { id } = req.params;
+  delete urlDatabase[id];
+  res.redirect("/urls");
+});
+
+app.post("/urls/:id/edit", (req, res) => {
+  let { id } = req.params;
+  urlDatabase[id] = req.body.longURL;
+  res.redirect("/urls");
 });
