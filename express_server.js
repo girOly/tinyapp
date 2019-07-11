@@ -5,6 +5,8 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
+const bcrypt = require("bcrypt");
+const functions = require("./functions");
 const {
   findEmail,
   generateRandomString,
@@ -157,6 +159,7 @@ app.post("/register", (req, res) => {
     res.end("400 Error Email");
   } else if (!findEmail(email, users)) {
     let id = addNewUser(email, password, users);
+    console.log("Users:", users);
     res.cookie("user_id", id);
     res.redirect("/urls");
   }
@@ -164,11 +167,12 @@ app.post("/register", (req, res) => {
 
 app.post("/login", (req, res) => {
   let { email, password } = req.body;
+  let id = checkPassword(password, users)
   if (email === "" || password === "") {
     return "400 Error";
   } else if (findEmail(email, users)) {
-    if (checkPassword(password, users)) {
-      let id = addNewUser(email, password, users);
+    if (id) {
+      // let id = addNewUser(email, password, users);
       res.cookie("user_id", id);
       res.redirect("/urls");
     } else {
