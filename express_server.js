@@ -4,21 +4,30 @@ const app = express(); // Express Framework
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const morgan = require("morgan");
 const {
   findEmail,
   generateRandomString,
   addNewUser,
-  checkPassword
+  checkPassword,
+  filterUrls
 } = require("./functions");
+
+app.use(morgan(":method :url :response-time"));
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
+
+// const urlDatabase = {
+//   b2xVn2: "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com"
+// };
 
 const users = {
   userRandomID: {
@@ -51,12 +60,21 @@ app.get("/hello", (req, res) => {
 app.get("/urls/new", (req, res) => {
   userId = req.cookies["user_id"] ? req.cookies["user_id"] : "";
   let templateVars = { urls: urlDatabase, user: users[userId] };
-  res.render("urls_new", templateVars);
+  if (req.cookies["user_id"]) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.get("/urls", (req, res) => {
   userId = req.cookies["user_id"] ? req.cookies["user_id"] : "";
-  let templateVars = { urls: urlDatabase, user: users[userId] };
+  let filteredData = filterUrls(userId, urlDatabase);
+  let templateVars = {
+    user: users[userId],
+    urls: filteredData
+  };
+
   res.render("urls_index", templateVars);
 });
 app.get("/urls/:shortURL", (req, res) => {
@@ -92,7 +110,10 @@ app.get("/login", (req, res) => {
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: req.cookies.user_id
+  };
   // console.log(urlDatabase);
   //
   // res.send("Redirection in progres.."); // Respond with 'Ok' (we will replace this)
@@ -146,11 +167,8 @@ app.post("/login", (req, res) => {
   if (email === "" || password === "") {
     return "400 Error";
   } else if (findEmail(email, users)) {
-    // Check Email - Password
-    console.log("Were almost there");
     if (checkPassword(password, users)) {
-      console.log("We never make it to here");
-        let id = addNewUser(email, password, users);
+      let id = addNewUser(email, password, users);
       res.cookie("user_id", id);
       res.redirect("/urls");
     } else {
