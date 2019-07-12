@@ -50,7 +50,14 @@ const getUserByEmail = function(email, users) {
       return users[userId].id;
     }
   }
-  return undefined
+  return undefined;
+};
+// Edits the Long URL
+const urlEdit = (Id, longURL, Session, urlDatabase) => {
+  console.log(Id);
+  console.log(longURL);
+  console.log(Session);
+  urlDatabase[Id] = { longURL, Session };
 };
 
 // ---- Module Exports
@@ -60,5 +67,6 @@ module.exports = {
   addNewUser,
   checkPassword,
   filterUrls,
-  getUserByEmail
+  getUserByEmail,
+  urlEdit
 };

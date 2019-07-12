@@ -11,7 +11,8 @@ const {
   generateRandomString,
   addNewUser,
   checkPassword,
-  filterUrls
+  filterUrls,
+  urlEdit
 } = require("./helpers");
 
 app.use(
@@ -127,7 +128,9 @@ app.post("/urls/:id/delete", (req, res) => {
 // Edit Url
 app.post("/urls/:id/edit", (req, res) => {
   let { id } = req.params;
-  urlDatabase[id] = req.body.longURL;
+  let { session } = req.session.user_id
+  let { longURL } = req.body;
+  urlEdit(id, session, longURL, urlDatabase);
   res.redirect("/urls");
 });
 // Log out from the Website / Clears Session
@@ -159,9 +162,9 @@ app.post("/login", (req, res) => {
       req.session.user_id = id;
       res.redirect("/urls");
     } else {
-      res.end("400 Error ");
+      res.write("400 Error ");
     }
   } else if (!findEmail(email, users)) {
-    res.write("403 Error");
+    res.end("403 Error");
   }
 });
