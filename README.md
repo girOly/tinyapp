@@ -4,7 +4,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 !["User Index"](#)
-!["Creating a Shortened URL"](#)
+!["Creating a Shortened URL"](https://github.com/girOly/tinyapp/blob/master/tinyapp%20-%20photos/create.png?raw=true)
 !["Index after generated URL"](#)
 
 ## Dependencies
