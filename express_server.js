@@ -80,7 +80,7 @@ app.get("/urls/:shortURL", (req, res) => {
   userId = req.session.user_id ? req.session.user_id : "";
   let templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
     user: users[userId]
   };
   res.render("urls_show", templateVars);
@@ -128,9 +128,8 @@ app.post("/urls/:id/delete", (req, res) => {
 // Edit Url
 app.post("/urls/:id/edit", (req, res) => {
   let { id } = req.params;
-  let { session } = req.session.user_id
   let { longURL } = req.body;
-  urlEdit(id, session, longURL, urlDatabase);
+  urlEdit(id, longURL, urlDatabase);
   res.redirect("/urls");
 });
 // Log out from the Website / Clears Session

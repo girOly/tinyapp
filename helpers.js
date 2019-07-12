@@ -53,11 +53,10 @@ const getUserByEmail = function(email, users) {
   return undefined;
 };
 // Edits the Long URL
-const urlEdit = (Id, longURL, Session, urlDatabase) => {
-  console.log(Id);
+const urlEdit = (id, longURL, urlDatabase) => {
+  console.log(id);
   console.log(longURL);
-  console.log(Session);
-  urlDatabase[Id] = { longURL, Session };
+  urlDatabase[id].longURL = longURL;
 };
 
 // ---- Module Exports
