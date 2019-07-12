@@ -11,9 +11,9 @@
         </div>
           <% if(user){ %>
   <div class="navbar-nav ml-auto ">
-          <h4 class="mr-2"> Logged in as: <%= user.email %> </h4>
+          <h4  class="mr-4">  Logged in as: <b> <i> <%= user.email %> <i> <b> </h4>
           <form method="POST" action="/logout">
-           <button type="submit" class="btn btn-outline-dark">Log Out</button>
+           <button type="submit" class="btn btn-danger">Log Out</button>
            </form>
    </div>
    <% } else { %>

@@ -5,8 +5,6 @@ const generateRandomString = function() {
     .substr(2, 5);
 };
 const checkPassword = function(password, users) {
-  console.log("Finding Password");
-  console.log("-".repeat(30));
   for (let userId in users) {
     if (bcrypt.compareSync(password, users[userId].password)) {
       return users[userId].id;
@@ -28,7 +26,6 @@ const findEmail = function(email, users) {
 const addNewUser = function(email, password, users) {
   let salt = bcrypt.genSaltSync(10);
   let id = generateRandomString();
-  console.log("Password:", password);
   const hashedPassword = bcrypt.hashSync(password, salt);
   users[id] = { id, email, password: hashedPassword };
   return id;
