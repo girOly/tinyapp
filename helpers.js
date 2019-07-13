@@ -54,8 +54,6 @@ const getUserByEmail = function(email, users) {
 };
 // Edits the Long URL
 const urlEdit = (id, longURL, urlDatabase) => {
-  console.log(id);
-  console.log(longURL);
   urlDatabase[id].longURL = longURL;
 };
 
