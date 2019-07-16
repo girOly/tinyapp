@@ -114,7 +114,12 @@ app.post("/urls", (req, res) => {
     longURL: req.body.longURL,
     userID: req.session.user_id
   };
-  res.redirect(`/urls/${shortURL}`);
+  let re = new RegExp("http://");
+  if (req.body.longURL.match(re)) {
+    res.redirect(`/urls/${shortURL}`);
+  } else {
+    res.end("Error - Please Provide a Valid Http URL");
+  }
 });
 // Implements long-url inside of shortened link
 app.get("/u/:shortURL", (req, res) => {
