@@ -93,7 +93,6 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/register", (req, res) => {
   userId = req.session.user_id ? req.session.user_id : "";
   let templateVars = {
-    shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
     user: users[userId]
   };
@@ -103,7 +102,6 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   userId = req.session.user_id ? req.session.user_id : "";
   let templateVars = {
-    shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
     user: users[userId]
   };
@@ -120,7 +118,8 @@ app.post("/urls", (req, res) => {
 });
 // Implements long-url inside of shortened link
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
+  console.log("LongUrl" + longURL);
   res.redirect(longURL);
 });
 // Delete Url
