@@ -4,8 +4,6 @@ const app = express(); // Express Framework
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
-const bcrypt = require("bcrypt");
-const helpers = require("./helpers");
 const {
   findEmail,
   generateRandomString,
@@ -29,31 +27,11 @@ app.set("view engine", "ejs");
 // _____________________________________________________________________________
 // urlDatabase - usersDatabase (To be imported into proper Database at later date)
 
-const urlDatabase = {
-  // Test Urls
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
-};
-const users = {
-  // Test Users
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur" // New Passwords are hashed by bcrypt
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk" //  ^^^
-  }
-};
+const urlDatabase = {};
+const users = {};
 // Redirects to main index - If not logged in, redirected to Login Page
 app.get("/", (req, res) => {
   res.redirect("/urls");
-});
-// Server Confirmation
-app.listen(PORT, () => {
-  console.log(`TinyApp listening on port ${PORT}!`);
 });
 // Renders New Url page if logged in, else redirected to Login Page
 app.get("/urls/new", (req, res) => {
@@ -83,7 +61,7 @@ app.get("/urls/:shortURL", (req, res) => {
     longURL: urlDatabase[req.params.shortURL].longURL,
     user: users[userId]
   };
-  if (userId) {
+  if (userId === urlDatabase[req.params.shortURL].userID) {
     res.render("urls_show", templateVars);
   } else {
     res.redirect("/login");
@@ -109,13 +87,13 @@ app.get("/login", (req, res) => {
 });
 // receives created url post, redirects to ShortURL page
 app.post("/urls", (req, res) => {
-  let shortURL = generateRandomString();
-  urlDatabase[shortURL] = {
-    longURL: req.body.longURL,
-    userID: req.session.user_id
-  };
-  let re = new RegExp("http://");
+  const re = new RegExp(/^(http:\/\/|https:\/\/|http:\/\/|https:\/\/)/gi);
   if (req.body.longURL.match(re)) {
+    let shortURL = generateRandomString();
+    urlDatabase[shortURL] = {
+      longURL: req.body.longURL,
+      userID: req.session.user_id
+    };
     res.redirect(`/urls/${shortURL}`);
   } else {
     res.end("Error - Please Provide a Valid Http URL");
@@ -124,7 +102,6 @@ app.post("/urls", (req, res) => {
 // Implements long-url inside of shortened link
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
-  console.log("LongUrl" + longURL);
   res.redirect(longURL);
 });
 // Delete Url
@@ -149,9 +126,9 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   let { email, password } = req.body;
   if (email === "" || password === "") {
-    res.end("400 Error");
+    res.end("400 Error - Bad Request");
   } else if (findEmail(email, users)) {
-    res.end("400 Error Email");
+    res.end("400 Error - Bad Request");
   } else if (!findEmail(email, users)) {
     let id = addNewUser(email, password, users);
     req.session.user_id = id;
@@ -169,9 +146,14 @@ app.post("/login", (req, res) => {
       req.session.user_id = id;
       res.redirect("/urls");
     } else {
-      res.write("400 Error ");
+      res.write("400 Error - Bad Request");
     }
   } else if (!findEmail(email, users)) {
-    res.end("403 Error");
+    res.end("403 Error - UnAuthorized");
   }
+});
+
+// Server Confirmation
+app.listen(PORT, () => {
+  console.log(`TinyApp listening on port ${PORT}!`);
 });
